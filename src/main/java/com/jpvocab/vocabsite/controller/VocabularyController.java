@@ -16,17 +16,12 @@ public class VocabularyController {
     private VocabularyMapper vocabularyMapper;
 
     @GetMapping("/all")
-    public List<Vocabulary> getAllVocabulary() {
-        return vocabularyMapper.findAll();
+    public List<Vocabulary> getAll(@RequestParam(defaultValue = "3000_common_") String prefix) {
+        return vocabularyMapper.getWordsByPrefix(prefix);
     }
 
     @GetMapping("/topics")
-    public List<String> getAllTopics() {
-        return vocabularyMapper.findDistinctTopics();
-    }
-
-    @GetMapping("/by-topic")
-    public List<Vocabulary> getVocabularyByTopic(@RequestParam String topic) {
-        return vocabularyMapper.findByTopic(topic);
+    public List<String> getTopics(@RequestParam(defaultValue = "3000_common_") String prefix) {
+        return vocabularyMapper.getTopicsByPrefix(prefix);
     }
 }
