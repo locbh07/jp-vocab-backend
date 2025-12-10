@@ -12,6 +12,7 @@ public class Vocabulary {
     private String level;
     private String image_url;
     private String audio_url;
+    private Integer core_order;
 
     // GETTER & SETTER
     public int getId() { return id; }
@@ -46,4 +47,12 @@ public class Vocabulary {
 
     public String getAudio_url() { return audio_url; }
     public void setAudio_url(String audio_url) { this.audio_url = audio_url; }
+    
+    public Integer getCore_order() {
+        return core_order;
+    }
+
+    public void setCore_order(Integer core_order) {
+        this.core_order = core_order;
+    }
 }

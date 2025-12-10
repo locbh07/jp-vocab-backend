@@ -14,4 +14,41 @@ public interface VocabularyMapper {
 
     @Select("SELECT DISTINCT topic FROM vocabulary WHERE topic LIKE CONCAT(#{prefix}, '%')")
     List<String> getTopicsByPrefix(@Param("prefix") String prefix);
+    
+ // Lấy danh sách từ mới chưa học dựa trên core_order
+    @Select(
+        "SELECT " +
+        " id, " +
+        " word_ja, " +
+        " word_hira_kana, " +
+        " word_romaji, " +
+        " word_vi, " +
+        " example_ja, " +
+        " example_vi, " +
+        " topic, " +
+        " level, " +
+        " image_url, " +
+        " audio_url, " +
+        " core_order " +
+        "FROM vocabulary " +
+        "WHERE core_order IS NOT NULL " +
+        "  AND id NOT IN ( " +
+        "        SELECT vocab_id FROM user_vocab_progress WHERE user_id = #{userId} " +
+        "  ) " +
+        "ORDER BY core_order ASC " +
+        "LIMIT #{limit}"
+    )
+    List<Vocabulary> getNewWordsForUser(
+            @Param("userId") Long userId,
+            @Param("limit") int limit
+    );
+
+
+
+    // D) tổng số từ core (6727 hiện tại)
+    @Select("SELECT COUNT(*) FROM vocabulary WHERE core_order IS NOT NULL")
+    int countCoreWords();
+    
+    @Select("SELECT * FROM vocabulary WHERE id = #{id}")
+    Vocabulary getById(@Param("id") int id);
 }
