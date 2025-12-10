@@ -198,8 +198,8 @@ public class LearningController {
 		res.setLearnedWords(learned);
 		res.setMasteredWords(mastered);
 		res.setInProgressWords(Math.max(learned - mastered, 0));
-		double percent = total == 0 ? 0.0 : (mastered * 100.0 / total);
-//        double percent = total == 0 ? 0.0 : (learned * 100.0 / total);
+//		double percent = total == 0 ? 0.0 : (mastered * 100.0 / total);
+        double percent = total == 0 ? 0.0 : (learned * 100.0 / total);
 		res.setProgressPercent(percent);
 
 		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
