@@ -42,6 +42,12 @@
     <version>8.0.33</version> <!-- Đây là dòng bạn đang thiếu -->
     <scope>runtime</scope>
   </dependency>
+  
+  <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.3</version> <!-- hoặc version gần đây -->
+</dependency>
 
   <!-- Thymeleaf -->
   <dependency>
