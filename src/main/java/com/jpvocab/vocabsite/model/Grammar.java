@@ -1,7 +1,7 @@
 package com.jpvocab.vocabsite.model;
 
 public class Grammar {
-    private String grammar_id;
+    private Long  grammar_id;
     private String grammar_point;
     private String grammar_point_romaji;
     private String level;
@@ -11,8 +11,8 @@ public class Grammar {
     private String note;
 
     // GETTER & SETTER
-    public String getGrammar_id() { return grammar_id; }
-    public void setGrammar_id(String grammar_id) { this.grammar_id = grammar_id; }
+    public Long  getGrammar_id() { return grammar_id; }
+    public void setGrammar_id(Long  grammar_id) { this.grammar_id = grammar_id; }
 
     public String getGrammar_point() { return grammar_point; }
     public void setGrammar_point(String grammar_point) { this.grammar_point = grammar_point; }

@@ -9,5 +9,5 @@ import java.util.List;
 public interface GrammarUsageMapper {
 
     @Select("SELECT * FROM grammar_usage WHERE grammar_id = #{grammarId}")
-    List<GrammarUsage> getUsagesByGrammarId(@Param("grammarId") String grammarId);
+    List<GrammarUsage> getUsagesByGrammarId(@Param("grammarId") Long  grammarId);
 }

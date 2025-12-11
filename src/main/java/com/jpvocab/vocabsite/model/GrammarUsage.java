@@ -1,15 +1,15 @@
 package com.jpvocab.vocabsite.model;
 
 public class GrammarUsage {
-    private String usage_id;
+    private Long  usage_id;
     private String grammar_id;
     private String formation;
     private String example_ja;
     private String example_vi;
 
     // GETTER & SETTER
-    public String getUsage_id() { return usage_id; }
-    public void setUsage_id(String usage_id) { this.usage_id = usage_id; }
+    public Long  getUsage_id() { return usage_id; }
+    public void setUsage_id(Long  usage_id) { this.usage_id = usage_id; }
 
     public String getGrammar_id() { return grammar_id; }
     public void setGrammar_id(String grammar_id) { this.grammar_id = grammar_id; }

@@ -13,5 +13,5 @@ public interface GrammarMapper {
     List<Grammar> getAllGrammar(@Param("level") String level);
 
     @Select("SELECT * FROM grammar WHERE grammar_id = #{grammarId}")
-    Grammar getGrammarById(@Param("grammarId") String grammarId);
+    Grammar getGrammarById(@Param("grammarId") Long  grammarId);
 }

@@ -30,7 +30,7 @@ public class GrammarController {
 
     // API: GET /grammar/{id}
     @GetMapping("/{id}")
-    public Map<String, Object> getGrammarDetail(@PathVariable("id") String id) {
+    public Map<String, Object> getGrammarDetail(@PathVariable("id") Long  id) {
         Grammar grammar = grammarMapper.getGrammarById(id);
         List<GrammarUsage> usages = usageMapper.getUsagesByGrammarId(id);
 
