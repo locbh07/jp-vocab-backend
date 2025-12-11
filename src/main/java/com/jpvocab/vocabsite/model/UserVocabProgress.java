@@ -14,7 +14,7 @@ public class UserVocabProgress {
     private Date last_reviewed_at;
     private Integer times_reviewed;
     private Integer last_result;
-    private Boolean is_mastered;
+    private Integer is_mastered;
 
     private Date created_at;
     private Date updated_at;
@@ -54,8 +54,8 @@ public class UserVocabProgress {
     public Integer getLast_result() { return last_result; }
     public void setLast_result(Integer last_result) { this.last_result = last_result; }
 
-    public Boolean getIs_mastered() { return is_mastered; }
-    public void setIs_mastered(Boolean is_mastered) { this.is_mastered = is_mastered; }
+    public Integer getIs_mastered() { return is_mastered; }
+    public void setIs_mastered(Integer is_mastered) { this.is_mastered = is_mastered; }
 
     public Date getCreated_at() { return created_at; }
     public void setCreated_at(Date created_at) { this.created_at = created_at; }

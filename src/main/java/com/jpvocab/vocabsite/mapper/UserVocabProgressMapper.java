@@ -35,7 +35,7 @@ public interface UserVocabProgressMapper {
 
     @Select("SELECT * FROM user_vocab_progress " +
             "WHERE user_id = #{userId} " +
-            "AND next_review_date <= CURDATE() " +
+            "AND next_review_date <= CURRENT_DATE " +
             "AND is_mastered = 0 " +
             "ORDER BY next_review_date ASC")
     @ResultMap("ProgressMap")

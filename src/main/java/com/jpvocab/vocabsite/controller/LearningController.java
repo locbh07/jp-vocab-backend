@@ -141,7 +141,7 @@ public class LearningController {
 			progress.setPlan_id(plan != null ? plan.getId() : null);
 			progress.setStage(0);
 			progress.setTimes_reviewed(0);
-			progress.setIs_mastered(false);
+			progress.setIs_mastered(0);
 			progress.setFirst_seen_date(new java.sql.Date(System.currentTimeMillis()));
 		}
 
@@ -157,7 +157,9 @@ public class LearningController {
 		}
 
 		progress.setStage(stage);
-		progress.setIs_mastered(stage >= 5);
+		if (stage >= 5) {
+			progress.setIs_mastered(1);
+		}
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());

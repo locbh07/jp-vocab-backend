@@ -9,10 +9,10 @@ import java.util.List;
 
 @Mapper
 public interface VocabularyMapper {
-    @Select("SELECT * FROM vocabulary WHERE topic LIKE CONCAT(#{prefix}, '%')")
+    @Select("SELECT * FROM vocabulary WHERE topic LIKE CONCAT(#{prefix}, '%') ORDER BY id ASC")
     List<Vocabulary> getWordsByPrefix(@Param("prefix") String prefix);
 
-    @Select("SELECT DISTINCT topic FROM vocabulary WHERE topic LIKE CONCAT(#{prefix}, '%')")
+    @Select("SELECT topic FROM vocabulary WHERE topic LIKE CONCAT(#{prefix}, '%') GROUP BY topic ORDER BY MIN(id) ASC")
     List<String> getTopicsByPrefix(@Param("prefix") String prefix);
     
  // Lấy danh sách từ mới chưa học dựa trên core_order
@@ -50,5 +50,5 @@ public interface VocabularyMapper {
     int countCoreWords();
     
     @Select("SELECT * FROM vocabulary WHERE id = #{id}")
-    Vocabulary getById(@Param("id") int id);
+    Vocabulary getById(@Param("id") long id);
 }
