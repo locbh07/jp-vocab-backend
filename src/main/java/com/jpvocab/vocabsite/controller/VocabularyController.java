@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vocabulary")
-@CrossOrigin(origins = "*")
 public class VocabularyController {
 
     @Autowired

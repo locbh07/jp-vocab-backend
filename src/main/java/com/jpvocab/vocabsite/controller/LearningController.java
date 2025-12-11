@@ -17,7 +17,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/learning")
-@CrossOrigin(origins = "http://localhost:5173")
 public class LearningController {
 
 	@Autowired
@@ -58,7 +57,7 @@ public class LearningController {
 		plan.setStart_date(start);
 		plan.setTarget_date(target);
 		plan.setDaily_new_words(daily);
-		plan.setIs_active(true);
+		plan.setIs_active(1);
 
 		planMapper.createPlan(plan);
 

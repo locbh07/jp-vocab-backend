@@ -9,7 +9,6 @@ import org.springframework.dao.DuplicateKeyException;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173")   // có WebConfig global thì dòng này có thể bỏ
 public class AuthController {
 
     @Autowired

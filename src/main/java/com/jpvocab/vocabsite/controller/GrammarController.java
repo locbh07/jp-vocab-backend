@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/grammar")
-@CrossOrigin(origins = "*")
 public class GrammarController {
 
     @Autowired

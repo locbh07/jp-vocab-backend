@@ -14,7 +14,7 @@ public class UserLearningPlan {
     private Date target_date;
 
     private Integer daily_new_words;
-    private Boolean is_active;
+    private Integer is_active;
 
     private Date created_at;
     private Date updated_at;
@@ -41,8 +41,8 @@ public class UserLearningPlan {
     public Integer getDaily_new_words() { return daily_new_words; }
     public void setDaily_new_words(Integer daily_new_words) { this.daily_new_words = daily_new_words; }
 
-    public Boolean getIs_active() { return is_active; }
-    public void setIs_active(Boolean is_active) { this.is_active = is_active; }
+    public Integer getIs_active() { return is_active; }
+    public void setIs_active(Integer is_active) { this.is_active = is_active; }
 
     public Date getCreated_at() { return created_at; }
     public void setCreated_at(Date created_at) { this.created_at = created_at; }
