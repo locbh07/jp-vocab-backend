@@ -4,6 +4,7 @@ import com.jpvocab.vocabsite.model.Vocabulary;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -51,4 +52,21 @@ public interface VocabularyMapper {
     
     @Select("SELECT * FROM vocabulary WHERE id = #{id}")
     Vocabulary getById(@Param("id") long id);
+
+    @Update(
+    "UPDATE vocabulary SET " +
+    " word_ja = #{word_ja}, " +
+    " word_hira_kana = #{word_hira_kana}, " +
+    " word_romaji = #{word_romaji}, " +
+    " word_vi = #{word_vi}, " +
+    " example_ja = #{example_ja}, " +
+    " example_vi = #{example_vi}, " +
+    " topic = #{topic}, " +
+    " level = #{level}, " +
+    " image_url = #{image_url}, " +
+    " audio_url = #{audio_url}, " +
+    " core_order = #{core_order} " +
+    "WHERE id = #{id}"
+)
+int updateVocabulary(Vocabulary vocab);
 }
