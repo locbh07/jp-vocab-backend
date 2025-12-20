@@ -15,10 +15,17 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "http://localhost:5173",                      // dev local
-                                "https://jp-vocab-frontend-p38r.vercel.app"   // frontend trên Vercel
+                                "http://localhost:5173",
+                                "https://jp-vocab-frontend-p38r.vercel.app"
                         )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods(
+                                "GET",
+                                "POST",
+                                "PUT",
+                                "PATCH",   // 🔥 BẮT BUỘC
+                                "DELETE",
+                                "OPTIONS"
+                        )
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
