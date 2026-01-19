@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jpvocab.vocabsite.mapper.LearningTodayMapper">
+
+  <resultMap id="LearningWordDtoMap" type="com.jpvocab.vocabsite.model.LearningWordDto">
+    <result property="wordId" column="word_id"/>
+    <result property="surface" column="surface"/>
+    <result property="reading" column="reading"/>
+    <result property="meaning" column="meaning"/>
+    <result property="learnedAt" column="learned_at"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <select id="getTodayLearnedWords" resultMap="LearningWordDtoMap">
+    SELECT
+      p.vocab_id AS word_id,
+      v.word_ja AS surface,
+      v.word_hira_kana AS reading,
+      v.word_vi AS meaning,
+      p.first_seen_date AS learned_at,
+      CASE WHEN p.is_mastered = 1 THEN 'mastered' ELSE 'in_progress' END AS status
+    FROM user_vocab_progress p
+    JOIN vocabulary v ON v.id = p.vocab_id
+    WHERE p.user_id = #{userId}
+    ORDER BY COALESCE(p.last_reviewed_at, p.first_seen_date) DESC NULLS LAST,
+             p.first_seen_date DESC,
+             p.vocab_id ASC
+  </select>
+
+</mapper>

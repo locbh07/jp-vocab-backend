@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jpvocab.vocabsite.mapper.QuizSessionMapper">
+
+  <resultMap id="QuizSessionMap" type="com.jpvocab.vocabsite.model.QuizSession">
+    <result property="id" column="id"/>
+    <result property="user_id" column="user_id"/>
+    <result property="session_date" column="session_date"/>
+    <result property="session_index" column="session_index"/>
+    <result property="batch_size" column="batch_size"/>
+    <result property="created_at" column="created_at"/>
+  </resultMap>
+
+  <select id="countSessionsToday" resultType="int">
+    SELECT COUNT(*)
+    FROM quiz_session
+    WHERE user_id = #{userId}
+      AND session_date = #{today}
+  </select>
+
+  <select id="findSessionByIndex" resultMap="QuizSessionMap">
+    SELECT
+      id,
+      user_id,
+      session_date,
+      session_index,
+      batch_size,
+      created_at
+    FROM quiz_session
+    WHERE user_id = #{userId}
+      AND session_date = #{today}
+      AND session_index = #{sessionIndex}
+    LIMIT 1
+  </select>
+
+  <insert id="insertSession" parameterType="com.jpvocab.vocabsite.model.QuizSession"
+          useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO quiz_session
+      (user_id, session_date, session_index, batch_size, created_at)
+    VALUES
+      (#{user_id}, #{session_date}, #{session_index}, #{batch_size}, #{created_at})
+  </insert>
+
+</mapper>

@@ -3,8 +3,20 @@ package com.jpvocab.vocabsite.controller;
 import com.jpvocab.vocabsite.mapper.UserLearningPlanMapper;
 import com.jpvocab.vocabsite.mapper.UserVocabProgressMapper;
 import com.jpvocab.vocabsite.mapper.VocabularyMapper;
+import com.jpvocab.vocabsite.mapper.LearningTodayMapper;
+import com.jpvocab.vocabsite.mapper.QuizSessionItemMapper;
+import com.jpvocab.vocabsite.mapper.QuizSessionMapper;
 import com.jpvocab.vocabsite.model.DailyStudyRow;
 import com.jpvocab.vocabsite.model.LearningDashboardResponse;
+import com.jpvocab.vocabsite.model.LearningTodayResponse;
+import com.jpvocab.vocabsite.model.LearningWordDto;
+import com.jpvocab.vocabsite.model.QuizPlanNextSession;
+import com.jpvocab.vocabsite.model.QuizPlanResponse;
+import com.jpvocab.vocabsite.model.QuizSession;
+import com.jpvocab.vocabsite.model.QuizSessionItem;
+import com.jpvocab.vocabsite.model.QuizSessionStartRequest;
+import com.jpvocab.vocabsite.model.QuizSessionStartResponse;
+import com.jpvocab.vocabsite.model.QuizWordDto;
 import com.jpvocab.vocabsite.model.UserLearningPlan;
 import com.jpvocab.vocabsite.model.UserVocabProgress;
 import com.jpvocab.vocabsite.model.Vocabulary;
@@ -12,6 +24,7 @@ import com.jpvocab.vocabsite.model.UserReviewLog;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -27,6 +40,15 @@ public class LearningController {
 
 	@Autowired
 	private VocabularyMapper vocabularyMapper;
+
+	@Autowired
+	private LearningTodayMapper learningTodayMapper;
+
+	@Autowired
+	private QuizSessionMapper quizSessionMapper;
+
+	@Autowired
+	private QuizSessionItemMapper quizSessionItemMapper;
 
 	// có thì Autowire, không có thì bỏ dòng này đi
 	@Autowired(required = false)
@@ -113,6 +135,109 @@ public class LearningController {
 				result.add(v);
 		}
 		return result;
+	}
+
+	// ---------- Từ đã học hôm nay ----------
+	@GetMapping("/today")
+	public LearningTodayResponse getTodayLearnedWords(@RequestParam("userId") Long userId) {
+		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+		List<LearningWordDto> items = learningTodayMapper.getTodayLearnedWords(userId, today);
+
+		LearningTodayResponse res = new LearningTodayResponse();
+		res.setDate(today.toString());
+		if (items == null) {
+			items = Collections.emptyList();
+		}
+		res.setItems(items);
+		res.setTotal(items.size());
+		return res;
+	}
+
+	// ---------- Quiz plan ----------
+	@GetMapping("/quiz/plan")
+	public QuizPlanResponse getQuizPlan(@RequestParam("userId") Long userId) {
+		final int batchSize = 5;
+		int totalLearned = progressMapper.countLearnedByUser(userId);
+		int plannedSessions = Math.min(Math.max(1 + (totalLearned / 50), 1), 10);
+
+		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+		int completedSessionsToday = quizSessionMapper.countSessionsToday(userId, today);
+		int remainingSessionsToday = Math.max(plannedSessions - completedSessionsToday, 0);
+
+		QuizPlanResponse res = new QuizPlanResponse();
+		res.setBatchSize(batchSize);
+		res.setPlannedSessions(plannedSessions);
+		res.setCompletedSessionsToday(completedSessionsToday);
+		res.setRemainingSessionsToday(remainingSessionsToday);
+
+		if (remainingSessionsToday > 0) {
+			QuizPlanNextSession nextSession = new QuizPlanNextSession();
+			nextSession.setSessionIndex(completedSessionsToday + 1);
+			List<QuizWordDto> items = quizSessionItemMapper.getNextQuizItems(userId, today, batchSize);
+			if (items == null) {
+				items = Collections.emptyList();
+			}
+			nextSession.setItems(items);
+			res.setNextSession(nextSession);
+		}
+
+		return res;
+	}
+
+	// ---------- Start quiz session ----------
+	@PostMapping("/quiz/session/start")
+	@Transactional
+	public QuizSessionStartResponse startQuizSession(@RequestBody QuizSessionStartRequest req) {
+		final int batchSize = 5;
+		Long userId = req.getUserId();
+		int sessionIndex = req.getSessionIndex();
+
+		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+		QuizSession existing = quizSessionMapper.findSessionByIndex(userId, today, sessionIndex);
+
+		QuizSessionStartResponse res = new QuizSessionStartResponse();
+		res.setBatchSize(batchSize);
+
+		if (existing != null) {
+			res.setSessionId(existing.getId());
+			List<QuizWordDto> items = quizSessionItemMapper.getItemsBySessionId(existing.getId());
+			if (items == null) {
+				items = Collections.emptyList();
+			}
+			res.setItems(items);
+			return res;
+		}
+
+		QuizSession session = new QuizSession();
+		session.setUser_id(userId);
+		session.setSession_date(today);
+		session.setSession_index(sessionIndex);
+		session.setBatch_size(batchSize);
+		session.setCreated_at(new Date());
+		quizSessionMapper.insertSession(session);
+
+		List<QuizWordDto> items = quizSessionItemMapper.getNextQuizItems(userId, today, batchSize);
+		if (items == null) {
+			items = Collections.emptyList();
+		}
+
+		List<QuizSessionItem> sessionItems = new ArrayList<>();
+		for (int i = 0; i < items.size(); i++) {
+			QuizWordDto item = items.get(i);
+			QuizSessionItem row = new QuizSessionItem();
+			row.setSession_id(session.getId());
+			row.setVocab_id(item.getWordId());
+			row.setItem_order(i + 1);
+			row.setCreated_at(new Date());
+			sessionItems.add(row);
+		}
+		if (!sessionItems.isEmpty()) {
+			quizSessionItemMapper.insertItems(sessionItems);
+		}
+
+		res.setSessionId(session.getId());
+		res.setItems(items);
+		return res;
 	}
 
 	// ---------- D) Nhận kết quả quiz / SRS ----------
