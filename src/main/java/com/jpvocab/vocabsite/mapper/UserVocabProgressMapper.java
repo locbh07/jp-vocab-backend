@@ -1,6 +1,7 @@
 package com.jpvocab.vocabsite.mapper;
 
 import com.jpvocab.vocabsite.model.UserVocabProgress;
+import com.jpvocab.vocabsite.model.DailyStudyRow;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -56,6 +57,43 @@ public interface UserVocabProgressMapper {
 
     @Select("SELECT COUNT(*) FROM user_vocab_progress WHERE user_id = #{userId} AND is_mastered = 1")
     int countMasteredByUser(Long userId);
+
+    @Select(
+            "SELECT COUNT(DISTINCT d) FROM (" +
+            "  SELECT DATE(first_seen_date) AS d FROM user_vocab_progress " +
+            "  WHERE user_id = #{userId} AND first_seen_date IS NOT NULL " +
+            "  UNION " +
+            "  SELECT DATE(last_reviewed_at) AS d FROM user_vocab_progress " +
+            "  WHERE user_id = #{userId} AND last_reviewed_at IS NOT NULL" +
+            ") t"
+    )
+    int countStudyDays(@Param("userId") Long userId);
+
+    @Select(
+            "SELECT MAX(d) FROM (" +
+            "  SELECT DATE(first_seen_date) AS d FROM user_vocab_progress " +
+            "  WHERE user_id = #{userId} AND first_seen_date IS NOT NULL " +
+            "  UNION " +
+            "  SELECT DATE(last_reviewed_at) AS d FROM user_vocab_progress " +
+            "  WHERE user_id = #{userId} AND last_reviewed_at IS NOT NULL" +
+            ") t"
+    )
+    java.sql.Date getLastStudyDate(@Param("userId") Long userId);
+
+    @Select(
+            "SELECT d AS study_date, COUNT(*) AS words FROM (" +
+            "  SELECT DATE(first_seen_date) AS d FROM user_vocab_progress " +
+            "  WHERE user_id = #{userId} AND first_seen_date IS NOT NULL " +
+            "  UNION ALL " +
+            "  SELECT DATE(last_reviewed_at) AS d FROM user_vocab_progress " +
+            "  WHERE user_id = #{userId} AND last_reviewed_at IS NOT NULL" +
+            ") t " +
+            "GROUP BY d " +
+            "ORDER BY d DESC " +
+            "LIMIT #{limit}"
+    )
+    List<DailyStudyRow> getStudyDays(@Param("userId") Long userId,
+                                     @Param("limit") int limit);
     
     // Đếm số từ mới đã được học lần đầu trong ngày (first_seen_date = hôm nay)
     @Select("SELECT COUNT(*) FROM user_vocab_progress " +
