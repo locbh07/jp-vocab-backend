@@ -4,6 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.jpvocab.vocabsite.mapper.VocabularyMapper;
 import com.jpvocab.vocabsite.model.Vocabulary;
 import com.jpvocab.vocabsite.service.OpenAiService;
+import com.jpvocab.vocabsite.service.VocabularyBulkService;
+import com.jpvocab.vocabsite.dto.BulkAiSuggestRequest;
+import com.jpvocab.vocabsite.dto.BulkAiSuggestResponse;
+import com.jpvocab.vocabsite.dto.BulkApplyRequest;
+import com.jpvocab.vocabsite.dto.BulkApplyResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +25,9 @@ public class AdminVocabularyController {
 
     @Autowired
     private OpenAiService openAiService;
+
+    @Autowired
+    private VocabularyBulkService vocabularyBulkService;
 
     @Autowired
     private AdminGuard adminGuard;
@@ -152,6 +160,32 @@ public class AdminVocabularyController {
 
         vocabularyMapper.updateVocabularyPartial(id, update);
         return vocabularyMapper.getById(id);
+    }
+
+    @PostMapping("/vocabulary/ai-suggest/bulk")
+    public BulkAiSuggestResponse bulkAiSuggest(
+            @RequestHeader(value = "X-Admin-Username", required = false) String adminUsername,
+            @RequestHeader(value = "X-Admin-UserId", required = false) Long adminUserId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String topic,
+            @RequestParam(required = false) String level,
+            @RequestParam(defaultValue = "50") Integer limit,
+            @RequestParam(defaultValue = "10") Integer batchSize,
+            @RequestParam(defaultValue = "fix") String mode,
+            @RequestBody(required = false) BulkAiSuggestRequest body
+    ) {
+        adminGuard.requireAdmin(adminUsername, adminUserId);
+        return vocabularyBulkService.suggestBulk(keyword, topic, level, limit, batchSize, mode, body);
+    }
+
+    @PostMapping("/vocabulary/apply/bulk")
+    public BulkApplyResponse bulkApply(
+            @RequestHeader(value = "X-Admin-Username", required = false) String adminUsername,
+            @RequestHeader(value = "X-Admin-UserId", required = false) Long adminUserId,
+            @RequestBody BulkApplyRequest body
+    ) {
+        adminGuard.requireAdmin(adminUsername, adminUserId);
+        return vocabularyBulkService.applyBulk(body);
     }
 
     private String asString(Object value) {

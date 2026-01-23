@@ -84,6 +84,13 @@ public interface VocabularyMapper {
             @Param("size") int size
     );
 
+    List<Vocabulary> searchAdminBulk(
+            @Param("keyword") String keyword,
+            @Param("topic") String topic,
+            @Param("level") String level,
+            @Param("limit") int limit
+    );
+
     @Insert(
         "INSERT INTO vocabulary (" +
         " word_ja, " +

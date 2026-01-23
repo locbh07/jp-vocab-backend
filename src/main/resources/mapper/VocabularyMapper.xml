@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jpvocab.vocabsite.mapper.VocabularyMapper">
+
+  <select id="searchAdminBulk" resultType="com.jpvocab.vocabsite.model.Vocabulary">
+    SELECT *
+    FROM vocabulary
+    WHERE 1=1
+    <if test="keyword != null and keyword.trim() != ''">
+      AND (
+        LOWER(word_ja) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+        OR LOWER(word_hira_kana) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+        OR LOWER(word_romaji) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+        OR LOWER(word_vi) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+      )
+    </if>
+    <if test="topic != null and topic.trim() != ''">
+      AND topic = #{topic}
+    </if>
+    <if test="level != null and level.trim() != ''">
+      AND level = #{level}
+    </if>
+    ORDER BY id DESC
+    LIMIT #{limit}
+  </select>
+
+</mapper>
