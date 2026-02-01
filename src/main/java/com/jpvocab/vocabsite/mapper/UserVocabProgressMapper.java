@@ -59,6 +59,25 @@ public interface UserVocabProgressMapper {
     int countMasteredByUser(Long userId);
 
     @Select(
+            "SELECT COUNT(*) FROM user_vocab_progress p " +
+            "JOIN vocabulary v ON v.id = p.vocab_id " +
+            "WHERE p.user_id = #{userId} " +
+            "AND v.topic LIKE CONCAT(#{prefix}, '%')"
+    )
+    int countLearnedByUserAndPrefix(@Param("userId") Long userId,
+                                    @Param("prefix") String prefix);
+
+    @Select(
+            "SELECT COUNT(*) FROM user_vocab_progress p " +
+            "JOIN vocabulary v ON v.id = p.vocab_id " +
+            "WHERE p.user_id = #{userId} " +
+            "AND p.is_mastered = 1 " +
+            "AND v.topic LIKE CONCAT(#{prefix}, '%')"
+    )
+    int countMasteredByUserAndPrefix(@Param("userId") Long userId,
+                                     @Param("prefix") String prefix);
+
+    @Select(
             "SELECT COUNT(DISTINCT d) FROM (" +
             "  SELECT DATE(first_seen_date) AS d FROM user_vocab_progress " +
             "  WHERE user_id = #{userId} AND first_seen_date IS NOT NULL " +

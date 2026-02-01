@@ -13,8 +13,8 @@ public interface UserLearningPlanMapper {
     UserLearningPlan getActivePlan(@Param("userId") Long userId);
 
     @Insert("INSERT INTO user_learning_plan " +
-            "(user_id, total_words, target_months, start_date, target_date, daily_new_words, is_active) " +
-            "VALUES (#{user_id}, #{total_words}, #{target_months}, #{start_date}, #{target_date}, #{daily_new_words}, #{is_active})")
+            "(user_id, total_words, target_months, topic_prefix, start_date, target_date, daily_new_words, is_active) " +
+            "VALUES (#{user_id}, #{total_words}, #{target_months}, #{topic_prefix}, #{start_date}, #{target_date}, #{daily_new_words}, #{is_active})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void createPlan(UserLearningPlan plan);
 

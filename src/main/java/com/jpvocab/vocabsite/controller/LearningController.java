@@ -57,9 +57,15 @@ public class LearningController {
 	// ---------- A) Tạo / cập nhật lộ trình ----------
 	@PostMapping("/plan")
 	public UserLearningPlan createPlan(@RequestParam("userId") Long userId,
-			@RequestParam("targetMonths") Integer targetMonths) {
+			@RequestParam("targetMonths") Integer targetMonths,
+			@RequestParam(value = "topicPrefix", required = false) String topicPrefix) {
 
-		int totalWords = vocabularyMapper.countCoreWords(); // 6727
+		String normalizedPrefix = (topicPrefix != null && !topicPrefix.trim().isEmpty())
+				? topicPrefix.trim()
+				: null;
+		int totalWords = normalizedPrefix != null
+				? vocabularyMapper.countWordsByPrefix(normalizedPrefix)
+				: vocabularyMapper.countCoreWords(); // 6727
 
 		// tắt plan cũ
 		planMapper.deactivateAllPlans(userId);
@@ -76,6 +82,7 @@ public class LearningController {
 		plan.setUser_id(userId);
 		plan.setTotal_words(totalWords);
 		plan.setTarget_months(targetMonths);
+		plan.setTopic_prefix(normalizedPrefix);
 		plan.setStart_date(start);
 		plan.setTarget_date(target);
 		plan.setDaily_new_words(daily);
@@ -101,6 +108,7 @@ public class LearningController {
 		}
 
 		int dailyLimit = plan.getDaily_new_words();
+		String topicPrefix = plan.getTopic_prefix();
 
 		// Lấy "hôm nay" kiểu java.sql.Date để so sánh với cột DATE trong DB
 		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
@@ -115,6 +123,9 @@ public class LearningController {
 		}
 
 		// Chỉ lấy thêm đúng số "remaining" từ mới chưa có progress
+		if (topicPrefix != null && !topicPrefix.trim().isEmpty()) {
+			return vocabularyMapper.getNewWordsForUserByPrefix(userId, topicPrefix.trim(), remaining);
+		}
 		return vocabularyMapper.getNewWordsForUser(userId, remaining);
 	}
 
@@ -313,12 +324,22 @@ public class LearningController {
 
 	// ---------- E) Dashboard ----------
 	@GetMapping("/dashboard")
-	public LearningDashboardResponse getDashboard(@RequestParam("userId") Long userId) {
+	public LearningDashboardResponse getDashboard(@RequestParam("userId") Long userId,
+			@RequestParam(value = "topicPrefix", required = false) String topicPrefix) {
 		LearningDashboardResponse res = new LearningDashboardResponse();
 
-		int total = vocabularyMapper.countCoreWords();
-		int learned = progressMapper.countLearnedByUser(userId);
-		int mastered = progressMapper.countMasteredByUser(userId);
+		String normalizedPrefix = (topicPrefix != null && !topicPrefix.trim().isEmpty())
+				? topicPrefix.trim()
+				: null;
+		int total = normalizedPrefix != null
+				? vocabularyMapper.countWordsByPrefix(normalizedPrefix)
+				: vocabularyMapper.countCoreWords();
+		int learned = normalizedPrefix != null
+				? progressMapper.countLearnedByUserAndPrefix(userId, normalizedPrefix)
+				: progressMapper.countLearnedByUser(userId);
+		int mastered = normalizedPrefix != null
+				? progressMapper.countMasteredByUserAndPrefix(userId, normalizedPrefix)
+				: progressMapper.countMasteredByUser(userId);
 
 		res.setTotalCoreWords(total);
 		res.setLearnedWords(learned);

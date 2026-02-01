@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +26,19 @@ public class VocabularyController {
     @GetMapping("/topics")
     public List<String> getTopics(@RequestParam(defaultValue = "3000_common_") String prefix) {
         return vocabularyMapper.getTopicsByPrefix(prefix);
+    }
+
+    @GetMapping("/count")
+    public Map<String, Integer> getCount(@RequestParam(value = "prefix", required = false) String prefix) {
+        String normalizedPrefix = (prefix != null && !prefix.trim().isEmpty())
+                ? prefix.trim()
+                : null;
+        int count = (normalizedPrefix != null)
+                ? vocabularyMapper.countWordsByPrefix(normalizedPrefix)
+                : vocabularyMapper.countCoreWords();
+        Map<String, Integer> res = new HashMap<>();
+        res.put("count", count);
+        return res;
     }
 
     @PatchMapping("/{id}")

@@ -50,6 +50,37 @@ public interface VocabularyMapper {
     // D) tổng số từ core (6727 hiện tại)
     @Select("SELECT COUNT(*) FROM vocabulary WHERE core_order IS NOT NULL")
     int countCoreWords();
+
+    @Select("SELECT COUNT(*) FROM vocabulary WHERE topic LIKE CONCAT(#{prefix}, '%')")
+    int countWordsByPrefix(@Param("prefix") String prefix);
+
+    @Select(
+        "SELECT " +
+        " id, " +
+        " word_ja, " +
+        " word_hira_kana, " +
+        " word_romaji, " +
+        " word_vi, " +
+        " example_ja, " +
+        " example_vi, " +
+        " topic, " +
+        " level, " +
+        " image_url, " +
+        " audio_url, " +
+        " core_order " +
+        "FROM vocabulary " +
+        "WHERE topic LIKE CONCAT(#{prefix}, '%') " +
+        "  AND id NOT IN ( " +
+        "        SELECT vocab_id FROM user_vocab_progress WHERE user_id = #{userId} " +
+        "  ) " +
+        "ORDER BY core_order ASC, id ASC " +
+        "LIMIT #{limit}"
+    )
+    List<Vocabulary> getNewWordsForUserByPrefix(
+            @Param("userId") Long userId,
+            @Param("prefix") String prefix,
+            @Param("limit") int limit
+    );
     
     @Select("SELECT * FROM vocabulary WHERE id = #{id}")
     Vocabulary getById(@Param("id") long id);

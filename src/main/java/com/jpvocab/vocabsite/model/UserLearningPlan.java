@@ -9,6 +9,7 @@ public class UserLearningPlan {
 
     private Integer total_words;
     private Integer target_months;
+    private String topic_prefix;
 
     private Date start_date;
     private Date target_date;
@@ -31,6 +32,9 @@ public class UserLearningPlan {
 
     public Integer getTarget_months() { return target_months; }
     public void setTarget_months(Integer target_months) { this.target_months = target_months; }
+
+    public String getTopic_prefix() { return topic_prefix; }
+    public void setTopic_prefix(String topic_prefix) { this.topic_prefix = topic_prefix; }
 
     public Date getStart_date() { return start_date; }
     public void setStart_date(Date start_date) { this.start_date = start_date; }
