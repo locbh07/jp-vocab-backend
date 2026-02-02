@@ -9,6 +9,8 @@ public class UserAccount {
     private String email;
     private String role;
     private String createdAt;
+    private Boolean examEnabled;
+    private String examCode;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -30,5 +32,11 @@ public class UserAccount {
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public Boolean getExamEnabled() { return examEnabled; }
+    public void setExamEnabled(Boolean examEnabled) { this.examEnabled = examEnabled; }
+
+    public String getExamCode() { return examCode; }
+    public void setExamCode(String examCode) { this.examCode = examCode; }
 }
 

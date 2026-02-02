@@ -13,15 +13,15 @@ public interface UserMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertUser(UserAccount user);
 
-    @Select("SELECT * FROM useraccount WHERE username = #{username} LIMIT 1")
+    @Select("SELECT id, username, passwordHash, fullName, email, role, createdAt, exam_enabled AS examEnabled, exam_code AS examCode FROM useraccount WHERE username = #{username} LIMIT 1")
     UserAccount findByUsername(@Param("username") String username);
 
-    @Select("SELECT * FROM useraccount WHERE id = #{id}")
+    @Select("SELECT id, username, passwordHash, fullName, email, role, createdAt, exam_enabled AS examEnabled, exam_code AS examCode FROM useraccount WHERE id = #{id}")
     UserAccount findById(@Param("id") Long id);
 
     @Select({
         "<script>",
-        "SELECT * FROM useraccount",
+        "SELECT id, username, passwordHash, fullName, email, role, createdAt, exam_enabled AS examEnabled, exam_code AS examCode FROM useraccount",
         "WHERE 1=1",
         "<if test='keyword != null and keyword.trim() != \"\"'>",
         "  AND (",
@@ -47,6 +47,8 @@ public interface UserMapper {
         "<if test='u.fullName != null'>fullName = #{u.fullName},</if>",
         "<if test='u.email != null'>email = #{u.email},</if>",
         "<if test='u.role != null'>role = #{u.role},</if>",
+        "<if test='u.examEnabled != null'>exam_enabled = #{u.examEnabled},</if>",
+        "<if test='u.examCode != null'>exam_code = #{u.examCode},</if>",
         "</set>",
         "WHERE id = #{id}",
         "</script>"

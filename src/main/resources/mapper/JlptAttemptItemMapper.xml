@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jpvocab.vocabsite.mapper.JlptAttemptItemMapper">
+
+  <insert id="insertItems">
+    INSERT INTO jlpt_attempt_item
+      (attempt_id, part, section_index, question_index, question_id,
+       selected, correct_answer, is_correct, question_json)
+    VALUES
+    <foreach collection="items" item="item" separator=",">
+      (
+        #{item.attempt_id},
+        #{item.part},
+        #{item.section_index},
+        #{item.question_index},
+        #{item.question_id},
+        #{item.selected},
+        #{item.correct_answer},
+        #{item.is_correct},
+        CAST(#{item.question_json} AS jsonb)
+      )
+    </foreach>
+  </insert>
+
+</mapper>

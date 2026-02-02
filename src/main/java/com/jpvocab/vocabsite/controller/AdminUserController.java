@@ -2,8 +2,10 @@ package com.jpvocab.vocabsite.controller;
 
 import com.jpvocab.vocabsite.mapper.UserMapper;
 import com.jpvocab.vocabsite.mapper.UserVocabProgressMapper;
+import com.jpvocab.vocabsite.mapper.UserExamCodeMapper;
 import com.jpvocab.vocabsite.model.DailyStudyRow;
 import com.jpvocab.vocabsite.model.UserAccount;
+import com.jpvocab.vocabsite.model.UserExamCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +26,15 @@ public class AdminUserController {
     @Autowired
     private AdminGuard adminGuard;
 
+    @Autowired
+    private UserExamCodeMapper examCodeMapper;
+
     public static class AdminUserUpdateRequest {
         public String fullName;
         public String email;
         public String role;
+        public Boolean examEnabled;
+        public String examCode;
     }
 
     public static class AdminUserStatsResponse {
@@ -35,6 +42,12 @@ public class AdminUserController {
         public String lastStudyDate;
         public int totalLearnedVocab;
         public int currentStreakDays;
+    }
+
+    public static class ExamCodeUpdateItem {
+        public String level;
+        public String code;
+        public Boolean enabled;
     }
 
     @GetMapping("/users")
@@ -89,7 +102,9 @@ public class AdminUserController {
         update.setFullName(req.fullName);
         update.setEmail(req.email);
         update.setRole(req.role);
-        if (update.getFullName() == null && update.getEmail() == null && update.getRole() == null) {
+        update.setExamEnabled(req.examEnabled);
+        update.setExamCode(req.examCode);
+        if (update.getFullName() == null && update.getEmail() == null && update.getRole() == null && update.getExamEnabled() == null && update.getExamCode() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No fields to update");
         }
         userMapper.updateUserFields(user.getId(), update);
@@ -118,6 +133,46 @@ public class AdminUserController {
 
         List<DailyStudyRow> rows = progressMapper.getStudyDays(userId, 365);
         res.currentStreakDays = computeStreak(rows);
+        return res;
+    }
+
+    @GetMapping("/users/{userId}/exam-codes")
+    public List<UserExamCode> getExamCodes(
+            @RequestHeader(value = "X-Admin-Username", required = false) String adminUsername,
+            @RequestHeader(value = "X-Admin-UserId", required = false) Long adminUserId,
+            @PathVariable Long userId
+    ) {
+        adminGuard.requireAdmin(adminUsername, adminUserId);
+        return examCodeMapper.getByUser(userId);
+    }
+
+    @PutMapping("/users/{userId}/exam-codes")
+    public Map<String, Object> updateExamCodes(
+            @RequestHeader(value = "X-Admin-Username", required = false) String adminUsername,
+            @RequestHeader(value = "X-Admin-UserId", required = false) Long adminUserId,
+            @PathVariable Long userId,
+            @RequestBody List<ExamCodeUpdateItem> items
+    ) {
+        adminGuard.requireAdmin(adminUsername, adminUserId);
+        if (items == null || items.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No exam codes provided");
+        }
+        List<UserExamCode> upserts = new ArrayList<>();
+        for (ExamCodeUpdateItem item : items) {
+            if (item == null || item.level == null || item.code == null) continue;
+            UserExamCode row = new UserExamCode();
+            row.setUser_id(userId);
+            row.setLevel(item.level);
+            row.setCode(item.code);
+            row.setEnabled(item.enabled != null ? item.enabled : Boolean.TRUE);
+            upserts.add(row);
+        }
+        if (upserts.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No valid exam codes provided");
+        }
+        int updated = examCodeMapper.upsertCodes(upserts);
+        Map<String, Object> res = new HashMap<>();
+        res.put("updated", updated);
         return res;
     }
 
