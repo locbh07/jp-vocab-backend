@@ -12,6 +12,7 @@ public class LearningWordDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date learnedAt;
     private String status;
+    private Integer stage;
 
     public Long getWordId() {
         return wordId;
@@ -48,5 +49,11 @@ public class LearningWordDto {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+    public Integer getStage() {
+        return stage;
+    }
+    public void setStage(Integer stage) {
+        this.stage = stage;
     }
 }

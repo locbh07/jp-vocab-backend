@@ -150,12 +150,28 @@ public class LearningController {
 
 	// ---------- Từ đã học hôm nay ----------
 	@GetMapping("/today")
-	public LearningTodayResponse getTodayLearnedWords(@RequestParam("userId") Long userId) {
+	public LearningTodayResponse getTodayLearnedWords(@RequestParam("userId") Long userId,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate) {
 		java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
-		List<LearningWordDto> items = learningTodayMapper.getTodayLearnedWords(userId, today);
+		java.sql.Date end = (endDate == null || endDate.trim().isEmpty())
+				? today
+				: java.sql.Date.valueOf(endDate.trim());
+
+		java.sql.Date start;
+		if (startDate == null || startDate.trim().isEmpty()) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(end);
+			cal.add(Calendar.DAY_OF_MONTH, -6); // default: last 7 days including end
+			start = new java.sql.Date(cal.getTimeInMillis());
+		} else {
+			start = java.sql.Date.valueOf(startDate.trim());
+		}
+
+		List<LearningWordDto> items = learningTodayMapper.getTodayLearnedWords(userId, start, end);
 
 		LearningTodayResponse res = new LearningTodayResponse();
-		res.setDate(today.toString());
+		res.setDate(end.toString());
 		if (items == null) {
 			items = Collections.emptyList();
 		}

@@ -10,6 +10,7 @@
     <result property="meaning" column="meaning"/>
     <result property="learnedAt" column="learned_at"/>
     <result property="status" column="status"/>
+    <result property="stage" column="stage"/>
   </resultMap>
 
   <select id="getTodayLearnedWords" resultMap="LearningWordDtoMap">
@@ -19,10 +20,13 @@
       v.word_hira_kana AS reading,
       v.word_vi AS meaning,
       p.first_seen_date AS learned_at,
-      CASE WHEN p.is_mastered = 1 THEN 'mastered' ELSE 'in_progress' END AS status
+      CASE WHEN p.is_mastered = 1 THEN 'mastered' ELSE 'in_progress' END AS status,
+      p.stage AS stage
     FROM user_vocab_progress p
     JOIN vocabulary v ON v.id = p.vocab_id
     WHERE p.user_id = #{userId}
+      AND p.first_seen_date <![CDATA[>=]]> #{startDate}
+      AND p.first_seen_date <![CDATA[<=]]> #{endDate}
     ORDER BY COALESCE(p.last_reviewed_at, p.first_seen_date) DESC NULLS LAST,
              p.first_seen_date DESC,
              p.vocab_id ASC
