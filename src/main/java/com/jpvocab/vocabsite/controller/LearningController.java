@@ -295,6 +295,12 @@ public class LearningController {
 			progress.setIs_mastered(0);
 			progress.setFirst_seen_date(new java.sql.Date(System.currentTimeMillis()));
 		}
+		if (progress.getFirst_seen_date() == null) {
+			progress.setFirst_seen_date(new java.sql.Date(System.currentTimeMillis()));
+		}
+		if (progress.getPlan_id() == null && plan != null) {
+			progress.setPlan_id(plan.getId());
+		}
 
 		int stage = progress.getStage() == null ? 0 : progress.getStage();
 		int[] intervals = { 0, 1, 3, 7, 30, 90 };
